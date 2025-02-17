@@ -21,12 +21,19 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     input.addEventListener("input", () => {
-      // remove any non-digit characters
+      // Remove any non-digit characters
       input.value = input.value.replace(/[^0-9]/g, "");
 
-      // only one digit is stored
+      // Ensure that only one digit is stored
       if (input.value.length > 1) {
         input.value = input.value.slice(0, 1);
+      }
+
+      // Clear all inputs after this one.
+      // This ensures that if a user updates an already filled input,
+      // all digits entered in subsequent inputs are cleared.
+      for (let i = index + 1; i < inputArray.length; i++) {
+        inputArray[i].value = "";
       }
 
       // If this input is now filled, focus the next empty input (if any)
@@ -38,14 +45,17 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
 
-    // Enforce sequential filling:
+    // Enforce sequential filling only for empty inputs.
+    // Allow editing of already filled inputs even if there are empty ones.
     input.addEventListener("focus", () => {
-      const firstEmpty = inputArray.find((el) => !el.value);
-      if (firstEmpty && firstEmpty !== input) {
-        firstEmpty.focus();
+      // Only redirect if the input is empty
+      if (!input.value) {
+        // Find the first empty input from left to right
+        const firstEmpty = inputArray.find((el) => !el.value);
+        if (firstEmpty && firstEmpty !== input) {
+          firstEmpty.focus();
+        }
       }
     });
   });
 });
-
-
