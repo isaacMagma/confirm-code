@@ -26,15 +26,17 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     input.addEventListener("input", () => {
-      // Remove any non-digit characters
+      // remove any non-digit characters
       input.value = input.value.replace(/[^0-9]/g, "");
 
-      // Ensure that only one digit is stored (safeguard)
+      // only one digit is stored
       if (input.value.length > 1) {
         input.value = input.value.slice(0, 1);
       }
 
       // Clear all inputs after this one.
+      // This ensures that if a user updates an already filled input,
+      // all digits entered in subsequent inputs are cleared.
       for (let i = index + 1; i < inputArray.length; i++) {
         inputArray[i].value = "";
       }
@@ -57,6 +59,20 @@ document.addEventListener("DOMContentLoaded", () => {
         const firstEmpty = inputArray.find((el) => !el.value);
         if (firstEmpty && firstEmpty !== input) {
           firstEmpty.focus();
+        }
+      }
+    });
+
+    // when a user deletes a digit, move focus to the last filled input.
+    input.addEventListener("keyup", (e) => {
+      if (["Backspace", "Delete"].includes(e.key)) {
+        if (input.value === "") {
+          for (let i = index - 1; i >= 0; i--) {
+            if (inputArray[i].value !== "") {
+              inputArray[i].focus();
+              break;
+            }
+          }
         }
       }
     });
