@@ -112,6 +112,7 @@ button:focus-visible {
   padding: 1rem;
   font-size: 3rem;
   line-height: 1;
+  text-align: center;
 }
 
 /* For Chrome, Safari, Edge, Opera */
