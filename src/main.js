@@ -10,26 +10,38 @@ document.addEventListener("DOMContentLoaded", () => {
     input.setAttribute("type", "password");
   });
 
-  // Function to update input types:
-  // Only the last filled input is visible (type="text") if an input is focused,
-  // otherwise (when no input is focused) all remain masked.
+  // Function to update input types based on current focus and filled state:
+  // - If the focused input is empty, show the last filled input's value.
+  // - If there are no empty inputs, show only the focused input's value.
+  // - If no input is focused, mask all inputs.
   function updateInputTypes() {
-    let lastFilledIndex = -1;
-    inputArray.forEach((input, index) => {
-      if (input.value !== "") {
-        lastFilledIndex = index;
-      }
-    });
+    const focusedElement = document.activeElement;
+    if (!container.contains(focusedElement)) {
+      inputArray.forEach(input => input.type = "password");
+      return;
+    }
 
-    inputArray.forEach((input, index) => {
-      // Only show the last filled input as text if an input is focused
-      if (container.contains(document.activeElement)) {
+    // Check if there's any empty input
+    const hasEmpty = inputArray.some(input => !input.value);
+
+    if (hasEmpty) {
+      // Focused input is empty:
+      // Find the last filled input and show its value.
+      let lastFilledIndex = -1;
+      inputArray.forEach((input, index) => {
+        if (input.value !== "") {
+          lastFilledIndex = index;
+        }
+      });
+      inputArray.forEach((input, index) => {
         input.type = index === lastFilledIndex ? "text" : "password";
-      } else {
-        // Mask all inputs when no input is focused
-        input.type = "password";
-      }
-    });
+      });
+    } else {
+      // All inputs are filled: only show the focused input.
+      inputArray.forEach(input => {
+        input.type = (input === focusedElement) ? "text" : "password";
+      });
+    }
   }
 
   inputArray.forEach((input, index) => {
@@ -75,21 +87,20 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }
 
-      // Update input types to reflect masking/visibility
+      // Update masking behavior after input changes.
       updateInputTypes();
     });
 
-    // Enforce sequential filling only for empty inputs.
+    // Enforce sequential filling for empty inputs.
     // Allow editing of already filled inputs even if there are empty ones.
     input.addEventListener("focus", () => {
-      // Only redirect if the input is empty.
       if (!input.value) {
+        // Redirect focus to the first empty input if the focused input is empty.
         const firstEmpty = inputArray.find((el) => !el.value);
         if (firstEmpty && firstEmpty !== input) {
           firstEmpty.focus();
         }
       }
-      // Update input types on focus change
       updateInputTypes();
     });
 
@@ -104,7 +115,6 @@ document.addEventListener("DOMContentLoaded", () => {
             }
           }
         }
-        // Update the input types after deletion
         updateInputTypes();
       }
     });
@@ -112,10 +122,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // When focus leaves the confirm-code container, mask all inputs.
   container.addEventListener("focusout", () => {
-    // Delay execution to allow the new focused element to be set
+    // Delay execution to allow the new focused element to be set.
     setTimeout(() => {
       if (!container.contains(document.activeElement)) {
-        // No input in the container has focus; mask all inputs.
         inputArray.forEach((input) => (input.type = "password"));
       }
     }, 0);
