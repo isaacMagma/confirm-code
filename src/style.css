@@ -113,3 +113,15 @@ button:focus-visible {
   font-size: 3rem;
   line-height: 1;
 }
+
+/* For Chrome, Safari, Edge, Opera */
+.confirm-code__wrapper input::-webkit-outer-spin-button,
+.confirm-code__wrapper input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* For Firefox */
+.confirm-code__wrapper input[type=number] {
+  -moz-appearance: textfield;
+}
